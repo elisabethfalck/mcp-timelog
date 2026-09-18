@@ -23,6 +23,9 @@ import { registerGetProjectContracts, registerGetContractHourlyRates } from "./t
 import { registerGetFixedPriceContractDetails } from "./tools/fixed-price-details.js";
 import { registerSearchProjects } from "./tools/search-projects.js";
 import { registerCreateTask } from "./tools/create-task.js";
+import { registerSearchCustomers } from "./tools/search-customers.js";
+import { registerGetProjectTemplates } from "./tools/project-templates.js";
+import { registerCreateProject } from "./tools/create-project.js";
 
 const config = loadConfig();
 const client = new TimelogClient(config);
@@ -53,6 +56,9 @@ registerGetContractHourlyRates(server, client);
 registerGetFixedPriceContractDetails(server, client);
 registerSearchProjects(server, client);
 registerCreateTask(server, client);
+registerSearchCustomers(server, client);
+registerGetProjectTemplates(server, client);
+registerCreateProject(server, client);
 
 const transport = new StdioServerTransport();
 await server.connect(transport);

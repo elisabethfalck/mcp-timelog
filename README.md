@@ -10,137 +10,46 @@ An [MCP](https://modelcontextprotocol.io) server that exposes the [Timelog](http
 - **Timesheet approval** — check submission status and submit timesheets, with filtering by employee, department, approver, or legal entity
 - **Organization** — look up legal entities and the current user profile
 - **Task search** — find tasks to register time on by name or number
+- **Projects** — search, view, and create projects, and create tasks/phases on them
+- **Contracts & rates** — view project contracts, hourly rates, and fixed-price contract details
 
 ## Tools
 
-### User & Organization
+**User & Organization**
+- `get_current_user` — get the authenticated user's profile
+- `get_legal_entities` — list legal entities
 
-#### `get_current_user`
-Get the authenticated user's profile (name, email, department). No parameters.
+**Projects & Tasks**
+- `search_projects` — find projects by name or number
+- `get_project` — get project details by ID
+- `get_project_tasks` — list tasks/phases on a project
+- `create_task` — create a task or sub-task on a project
+- `search_customers` — find customers by name
+- `get_project_templates` — list project templates
+- `create_project` — create a project from a template
 
-#### `get_legal_entities`
-Get all legal entities in the organization. Returns ID, name, active status, currency, and country for each entity. No parameters.
+**Contracts & Rates**
+- `get_project_contracts` — list contracts for a project
+- `get_contract_hourly_rates` — list hourly rates on a contract
+- `get_fixed_price_contract_details` — get value, payments, and rates for a fixed-price contract
+- `get_hourly_rates` — search hourly rates across the organization
 
-### Time Registrations
+**Time Registrations**
+- `get_weekly_registrations` — view a week's registrations
+- `get_registrations_by_date_range` — view registrations in a date range, with optional filtering by project/task
+- `get_financial_data` — view billable/invoice status for a date range
+- `search_tasks` — find tasks you can register time on
+- `create_time_registration` — log time on a task
+- `update_time_registration` — edit a registration
+- `delete_time_registration` — remove a registration
 
-#### `get_weekly_registrations`
-Get time registrations for a specific week, grouped by day with norm hours.
+**Absence**
+- `search_absence_codes` — find absence codes (vacation, sick leave, etc.)
+- `create_absence_registration` — register an absence
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `startDate` | string | Yes | Monday of the week (YYYY-MM-DD) |
-
-#### `get_registrations_by_date_range`
-Get time registrations between two dates.
-
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `startDate` | string | Yes | Start date (YYYY-MM-DD) |
-| `endDate` | string | Yes | End date (YYYY-MM-DD) |
-
-#### `get_financial_data`
-Get financial data (billable/invoice status) for time registrations in a date range.
-
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `startDate` | string | Yes | Start date (YYYY-MM-DD) |
-| `endDate` | string | Yes | End date (YYYY-MM-DD) |
-
-#### `search_tasks`
-Search for tasks the user can register time on. Returns task IDs needed for creating time registrations.
-
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `searchText` | string | No | Task name or task number to search for |
-| `searchAll` | boolean | No | Search all tasks, not just recent (default: false) |
-
-#### `create_time_registration`
-Create a new time registration on a task. Use `search_tasks` first to find the TaskID.
-
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `TaskID` | integer | Yes | Task identifier (from `search_tasks`) |
-| `Date` | string | Yes | Date of the registration (YYYY-MM-DD) |
-| `Hours` | number | Yes | Number of hours to register |
-| `Comment` | string | No | Comment for the registration |
-| `JiraId` | string | No | JIRA ticket ID (e.g. XXX-1234) |
-| `Billable` | boolean | No | Whether this time is billable (defaults to task setting) |
-
-#### `update_time_registration`
-Update an existing time registration. Only supply the fields you want to change.
-
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `TimeRegistrationID` | integer | Yes | Time registration ID to update |
-| `TaskID` | integer | Yes | Task identifier |
-| `Date` | string | No | New date (YYYY-MM-DD) |
-| `Hours` | number | No | New hours value |
-| `Comment` | string | No | New comment |
-| `JiraId` | string | No | JIRA ticket ID (e.g. SGI-82108) |
-| `Billable` | boolean | No | Whether this time is billable |
-
-#### `delete_time_registration`
-Delete a time registration by its GUID.
-
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `id` | string (UUID) | Yes | GUID of the time registration to delete |
-
-### Absence
-
-#### `search_absence_codes`
-Search for absence codes (e.g. Ferie, Sygdom). Returns AbsenceCodeID needed for `create_absence_registration`.
-
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `searchText` | string | No | Filter by absence code name or number |
-
-#### `create_absence_registration`
-Create an absence registration (vacation, sick leave, etc.). Use `search_absence_codes` to find the AbsenceCodeID. Registers a full working day by default.
-
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `AbsenceCodeID` | integer | Yes | Absence code identifier (from `search_absence_codes`) |
-| `Date` | string | Yes | Date of the absence (YYYY-MM-DD) |
-| `Hours` | number | No | Hours to register (omit for a full working day) |
-| `Comment` | string | No | Comment for the registration |
-
-### Timesheet Approval
-
-#### `get_timesheet_status`
-Get weekly timesheet approval/submission status. Defaults to the authenticated user. Omit `userId` to get all employees (manager view).
-
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `startDate` | string | Yes | Start date (YYYY-MM-DD) |
-| `endDate` | string | Yes | End date (YYYY-MM-DD) |
-| `userId` | integer | No | Filter by employee UserID (omit for all employees) |
-| `departmentId` | integer | No | Filter by department ID |
-| `approverId` | integer | No | Filter by approver UserID |
-| `legalEntityId` | integer | No | Filter by legal entity ID |
-
-#### `submit_timesheet`
-Submit a timesheet for approval for a date range (e.g. a full week).
-
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `startDate` | string | Yes | Start date (YYYY-MM-DD) |
-| `endDate` | string | Yes | End date (YYYY-MM-DD) |
-| `comment` | string | No | Comment for the submission |
-| `employeeUserId` | integer | No | UserID of the employee to submit for (defaults to authenticated user) |
-
-### Manager Workflows
-
-#### Finding and closing open timesheets
-
-Use `get_timesheet_status` without a `userId` to get the submission status for all employees in a period. Filter by `departmentId`, `approverId`, or `legalEntityId` to narrow the scope.
-
-Once you've identified employees with open timesheets, use `submit_timesheet` with `employeeUserId` to submit on their behalf.
-
-**Example prompts:**
-> "Show me everyone who hasn't submitted their timesheet this week"
-> "Submit this week's timesheet for user 1234"
-> "Submit all open timesheets for department 5 this week"
+**Timesheet Approval**
+- `get_timesheet_status` — check submission/approval status (yourself or, as a manager, your team)
+- `submit_timesheet` — submit a timesheet for approval, for yourself or on behalf of an employee
 
 ## Setup
 
