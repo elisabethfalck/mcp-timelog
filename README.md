@@ -1,6 +1,6 @@
 # Timelog MCP Server
 
-An [MCP](https://modelcontextprotocol.io) server that exposes the [Timelog](https://www.timelog.com) time registration API as tools for Claude. It lets you view, create, and manage time registrations, absences, and timesheet approvals through natural language.
+An [MCP](https://modelcontextprotocol.io) server that exposes the [Timelog](https://www.timelog.com) time registration API as tools for agentic use. It lets you view, create, and manage time registrations, absences, and timesheet approvals through natural language.
 
 ## Capabilities
 
